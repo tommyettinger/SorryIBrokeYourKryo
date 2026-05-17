@@ -25,7 +25,9 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void create() {
-        // Strongly recommended in this case to avoid storing anything in the problem fields!
+        // Not actually needed because our Array replacement always treats this as true anyway.
+        // This essentially needs to be either set to true or treated as true by Array to avoid
+        // the infinite serialization loop bug that 1.13.1 fixed by setting the iterables to transient.
         Collections.allocateIterators = true;
 
         // However you normally initialize Kryo, do it here.

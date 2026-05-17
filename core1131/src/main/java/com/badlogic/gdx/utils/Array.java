@@ -526,27 +526,15 @@ public class Array<T> implements Iterable<T> {
         }
     }
 
-    /** Returns an iterator for the items in the array. Remove is supported.
-     * <p>
-     * If {@link Collections#allocateIterators} is false, the same iterator instance is returned each time this method is called.
-     * Use the {@link ArrayIterator} constructor for nested or multithreaded iteration. */
+    /** Returns a newly-allocated iterator for the items in the array. Remove is supported. */
     public ArrayIterator<T> iterator () {
-        if (Collections.allocateIterators) return new ArrayIterator<T>(this, true);
-        if (iterable == null) iterable = new ArrayIterable<T>(this);
-        return iterable.iterator();
+        return new ArrayIterator<T>(this, true);
     }
 
-    /** Returns an iterable for the selected items in the array. Remove is supported, but not between hasNext() and next().
-     * <p>
-     * If {@link Collections#allocateIterators} is false, the same iterable instance is returned each time this method is called.
-     * Use the {@link Predicate.PredicateIterable} constructor for nested or multithreaded iteration. */
+    /** Returns a newly-allocated iterable for the selected items in the array.
+     * Remove is supported, but not between hasNext() and next(). */
     public Iterable<T> select (Predicate<T> predicate) {
-        if (Collections.allocateIterators) return new Predicate.PredicateIterable<T>(this, predicate);
-        if (predicateIterable == null)
-            predicateIterable = new Predicate.PredicateIterable<T>(this, predicate);
-        else
-            predicateIterable.set(this, predicate);
-        return predicateIterable;
+        return new Predicate.PredicateIterable<T>(this, predicate);
     }
 
     /** Reduces the size of the array to the specified size. If the array is already smaller than the specified size, no action is
@@ -722,23 +710,9 @@ public class Array<T> implements Iterable<T> {
             this.allowRemove = allowRemove;
         }
 
-        /** @see Collections#allocateIterators */
+        /** Always allocates a new iterator to avoid messing up non-transient saved iterators. */
         public ArrayIterator<T> iterator () {
-            if (Collections.allocateIterators) return new ArrayIterator<T>(array, allowRemove);
-            if (iterator1 == null) {
-                iterator1 = new ArrayIterator<T>(array, allowRemove);
-                iterator2 = new ArrayIterator<T>(array, allowRemove);
-            }
-            if (!iterator1.valid) {
-                iterator1.index = 0;
-                iterator1.valid = true;
-                iterator2.valid = false;
-                return iterator1;
-            }
-            iterator2.index = 0;
-            iterator2.valid = true;
-            iterator1.valid = false;
-            return iterator2;
+            return new ArrayIterator<T>(array, allowRemove);
         }
     }
 }
